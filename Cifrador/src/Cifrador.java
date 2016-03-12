@@ -54,26 +54,28 @@ public class Cifrador {
 		return c;
 	}
 	
-	public static void decifrar(InputStream archivo,Header cabecera,String path) throws IOException{
+	public static void decifrar(FileInputStream archivo,Header cabecera,String path) throws IOException{
 		Console console = System.console();
 
         char[] f1 = console.readPassword("[Frase de paso:]");
         Cipher c = getCifrador(f1, cabecera);
         
         CipherInputStream cis = new CipherInputStream(archivo,c);
-        
-        OutputStream fos = new FileOutputStream(path+".dcla");
+        FileOutputStream fos = new FileOutputStream(path+".dcla");
         byte[] b = new byte[512];
         int i = cis.read(b);
-        int total = i;
+        int total = i+1;
         while (i != -1) {
         	System.out.print(i+".");
             fos.write(b, 0, i);
             i = cis.read(b);
             total+=i;
         }
+        cabecera.load(cis);
+        fos.flush();
         fos.close();
         cis.close();
+        archivo.close();
         System.out.println("");
         System.out.println("Hecho:"+total);
 
@@ -94,24 +96,23 @@ public class Cifrador {
         Cipher c = getCifrador(f1, cabecera);
 		
         FileOutputStream out = new FileOutputStream(path+".dcif");
-        
-		CipherOutputStream cos = new CipherOutputStream(out,c);
-		cabecera.save(out);
-		//archivo.reset();
-		System.out.println(archivo.available());
+		//System.out.println(archivo.available());
+        cabecera.save(out);
 		byte[] b = new byte[1024];
 	    int i = archivo.read(b);
-	    int total = i;
+	    int total = i+1;
 	    while (i != -1) {
 	    	System.out.print(i+".");
-	    	//cos.write(b);
-	        cos.write(b, 0, i);
+	        out.write(b, 0, i);
 	        i = archivo.read(b);
 	        total+=i;
 	    }
+	    //out.flush();
+	    CipherOutputStream cos = new CipherOutputStream(out,c);
 	    cos.flush();
 		out.close();
 		cos.close();
+		archivo.close();
 		System.out.println("");
 		System.out.println("Hecho:"+total);
 		
@@ -132,8 +133,10 @@ public class Cifrador {
 		
 		//Se intenta cargar el archivo
 		FileInputStream in = null;
+		FileInputStream in_dcif = null;
 		try {
 			in = new FileInputStream(new File(path));
+			in_dcif = new FileInputStream(new File(path));
 		} catch (FileNotFoundException e) {
 			System.out.println("Ingrese una direccion de archivo valida");
 			System.exit(0);
@@ -141,7 +144,8 @@ public class Cifrador {
 		
 		System.out.println("Practica 2 BySS Daniel Correa");
 		String ex="";
-		if(!cabecera.load(in)){
+		
+		if(!cabecera.load(in_dcif)){
 			System.out.println("Vamos a cifrar!:");
 			System.out.println("Algoritmo: "+cabecera.getAlgorithm());
 			cifrar(in,cabecera,path);
