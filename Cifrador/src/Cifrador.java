@@ -24,7 +24,7 @@ import javax.crypto.spec.PBEParameterSpec;
 
 public class Cifrador {
 	
-	public static Cipher getCifrador(char[] f1,Header cabecera){
+	public static Cipher getCifrador(char[] f1,Header cabecera,boolean modo){
 		PBEKeySpec pbeKeySpec = new PBEKeySpec(f1);
 		PBEParameterSpec pPS = new PBEParameterSpec(cabecera.getSalt(),20);
 		Cipher c = null;
@@ -32,7 +32,12 @@ public class Cifrador {
 			SecretKeyFactory kf = SecretKeyFactory.getInstance(cabecera.getAlgorithm());
 			SecretKey sKey= kf.generateSecret(pbeKeySpec);
 			c = Cipher.getInstance(cabecera.getAlgorithm());
-			c.init(Cipher.ENCRYPT_MODE,sKey,pPS);
+			if(modo){
+				c.init(Cipher.ENCRYPT_MODE,sKey,pPS);
+			}else{
+				c.init(Cipher.DECRYPT_MODE,sKey,pPS);
+			}
+			
 		} catch (NoSuchAlgorithmException e) {
 			System.out.println("El algormito elegido no funciona con esta aplicacion");
 			System.out.println("Lista de algoritmos: PBEWithMD5AndDES, PBEWithMD5AndTripleDES1,PBEWithSHA1AndDESede, PBEWithSHA1AndRC2_40");
@@ -58,12 +63,13 @@ public class Cifrador {
 		Console console = System.console();
 
         char[] f1 = console.readPassword("[Frase de paso:]");
-        Cipher c = getCifrador(f1, cabecera);
-        
+        Cipher c = getCifrador(f1, cabecera,false);
         CipherInputStream cis = new CipherInputStream(archivo,c);
         FileOutputStream fos = new FileOutputStream(path+".dcla");
         byte[] b = new byte[512];
+        System.out.println("read problem");
         int i = cis.read(b);
+        System.out.println("depues");
         int total = i+1;
         while (i != -1) {
         	System.out.print(i+".");
@@ -71,7 +77,7 @@ public class Cifrador {
             i = cis.read(b);
             total+=i;
         }
-        cabecera.load(cis);
+        
         fos.flush();
         fos.close();
         cis.close();
@@ -93,7 +99,7 @@ public class Cifrador {
         	System.exit(0);
         }
         
-        Cipher c = getCifrador(f1, cabecera);
+        Cipher c = getCifrador(f1, cabecera,true);
 		
         FileOutputStream out = new FileOutputStream(path+".dcif");
 		//System.out.println(archivo.available());
@@ -144,7 +150,7 @@ public class Cifrador {
 		
 		System.out.println("Practica 2 BySS Daniel Correa");
 		String ex="";
-		
+		//decifrar(in,cabecera,path);
 		if(!cabecera.load(in_dcif)){
 			System.out.println("Vamos a cifrar!:");
 			System.out.println("Algoritmo: "+cabecera.getAlgorithm());
@@ -153,7 +159,7 @@ public class Cifrador {
 		}else{
 			System.out.println("Vamos a decifrar!:");
 			System.out.println("Algoritmo: "+cabecera.getAlgorithm());
-			decifrar(in,cabecera,path);
+			decifrar(in_dcif ,cabecera,path);
 			ex = ".dclear";
 		}
 		System.out.println("Proceso terminado");
