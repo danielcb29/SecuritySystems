@@ -12,6 +12,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -59,13 +60,14 @@ public class Cifrador {
 		return c;
 	}
 	
-	public static void decifrar(FileInputStream archivo,Header cabecera,String path) throws IOException{
+	public static void decifrar(InputStream archivo,Header cabecera,String path) throws IOException{
 		Console console = System.console();
 
         char[] f1 = console.readPassword("[Frase de paso:]");
+        //archivo = Base64.getDecoder().wrap(archivo);
         Cipher c = getCifrador(f1, cabecera,false);
         CipherInputStream cis = new CipherInputStream(archivo,c);
-        FileOutputStream fos = new FileOutputStream(path+".dcla");
+        OutputStream fos = new FileOutputStream(path+".dcla");
         byte[] b = new byte[512];
         System.out.println("read problem");
         int i = cis.read(b);
@@ -87,7 +89,7 @@ public class Cifrador {
 
 	}
 	
-	public static void cifrar(FileInputStream archivo,Header cabecera,String path) throws IOException{
+	public static void cifrar(InputStream archivo,Header cabecera,String path) throws IOException{
 		
 		Console console = System.console();
 
@@ -100,8 +102,8 @@ public class Cifrador {
         }
         
         Cipher c = getCifrador(f1, cabecera,true);
-		
-        FileOutputStream out = new FileOutputStream(path+".dcif");
+        OutputStream out = new FileOutputStream(path+".dcif");
+        //OutputStream out = Base64.getEncoder().wrap(new FileOutputStream(path+".dcif"));
 		//System.out.println(archivo.available());
         cabecera.save(out);
 		byte[] b = new byte[1024];
@@ -138,11 +140,11 @@ public class Cifrador {
 		}
 		
 		//Se intenta cargar el archivo
-		FileInputStream in = null;
-		FileInputStream in_dcif = null;
+		InputStream in = null;
+		InputStream in_dcif = null;
 		try {
-			in = new FileInputStream(new File(path));
-			in_dcif = new FileInputStream(new File(path));
+			in =  new FileInputStream(new File(path));
+			in_dcif =  new FileInputStream(new File(path));
 		} catch (FileNotFoundException e) {
 			System.out.println("Ingrese una direccion de archivo valida");
 			System.exit(0);
