@@ -68,12 +68,10 @@ public class Cifrador {
         Cipher c = getCifrador(f1, cabecera,false);
         CipherInputStream cis = new CipherInputStream(archivo,c);
         OutputStream fos = new FileOutputStream(path+".dcla");
-        byte[] b = new byte[512];
-        System.out.println("read problem");
+        byte[] b = new byte[1024];
         int i = cis.read(b);
-        System.out.println("depues");
         int total = i+1;
-        while (i != -1) {
+        while (i >= 0) {
         	System.out.print(i+".");
             fos.write(b, 0, i);
             i = cis.read(b);
@@ -106,20 +104,22 @@ public class Cifrador {
         //OutputStream out = Base64.getEncoder().wrap(new FileOutputStream(path+".dcif"));
 		//System.out.println(archivo.available());
         cabecera.save(out);
-		byte[] b = new byte[1024];
+        CipherOutputStream cos = new CipherOutputStream(out,c);
+		byte[] b = new byte[512];
 	    int i = archivo.read(b);
 	    int total = i+1;
 	    while (i != -1) {
 	    	System.out.print(i+".");
-	        out.write(b, 0, i);
+	        //out.write(b, 0, i);
+	    	cos.write(b, 0, i);
 	        i = archivo.read(b);
 	        total+=i;
 	    }
 	    //out.flush();
-	    CipherOutputStream cos = new CipherOutputStream(out,c);
+	    
 	    cos.flush();
-		out.close();
 		cos.close();
+		out.close();
 		archivo.close();
 		System.out.println("");
 		System.out.println("Hecho:"+total);
@@ -144,7 +144,8 @@ public class Cifrador {
 		InputStream in_dcif = null;
 		try {
 			in =  new FileInputStream(new File(path));
-			in_dcif =  new FileInputStream(new File(path));
+			//in_dcif =Base64.getDecoder().wrap(new FileInputStream(new File(path)));
+			in_dcif =new FileInputStream(new File(path));
 		} catch (FileNotFoundException e) {
 			System.out.println("Ingrese una direccion de archivo valida");
 			System.exit(0);
@@ -152,6 +153,7 @@ public class Cifrador {
 		
 		System.out.println("Practica 2 BySS Daniel Correa");
 		String ex="";
+		//cifrar(in,cabecera,path);
 		//decifrar(in,cabecera,path);
 		if(!cabecera.load(in_dcif)){
 			System.out.println("Vamos a cifrar!:");
