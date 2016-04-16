@@ -40,6 +40,14 @@ public class CifradoPublica {
         
     }
     
+    public void decifrar(File archivo){
+        
+    }
+    
+    public void cifrar(File archivo){
+        
+    }
+    
     public boolean verificarFirma(File archivo) throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException{
         System.out.println("Proceso de verificación de firma de: "+archivo.getAbsolutePath());
         cabecera= new Header();
@@ -67,6 +75,9 @@ public class CifradoPublica {
           boolean verifies = dsa.verify(sig);
           if (verifies){
               System.out.println("Firma Correcta!");
+              FileOutputStream fos = new FileOutputStream(archivo.getAbsolutePath()+".clear");
+              fos.write(data);
+              fos.close();
           }else{
               System.out.println("Firma incorrecta!");
           }
