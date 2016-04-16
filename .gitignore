@@ -5,3 +5,5 @@ RemoteSystemsTempFiles/
 .metadata/
 .recommenders/
 .DS_Store/
+/CifradoPublica/nbproject/private/
+/CifradoPublica/build/
