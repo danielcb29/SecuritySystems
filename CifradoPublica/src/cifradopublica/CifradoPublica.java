@@ -24,6 +24,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 /**
  *
  * @author daniel
@@ -35,16 +39,65 @@ public class CifradoPublica {
     private final String algoritmoClav = "RSA";
     private KeyPair claves;
     private Header cabecera;
+    private final int blockCifSize = 53;
+    private final int blockDcifSize = 64;
     
     CifradoPublica(){
         
     }
     
-    public void decifrar(File archivo){
+    public void decifrar(File archivo) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, FileNotFoundException, IOException, IllegalBlockSizeException, BadPaddingException{
         
+        FileInputStream fis = new FileInputStream(archivo.getAbsolutePath());
+        cabecera = new Header();
+        if (cabecera.load(fis)){
+            String alg = cabecera.getCipher();
+            System.out.println("Proceso de decifrado de: "+archivo.getAbsolutePath()+" con algoritmo: "+alg);
+            Cipher c = Cipher.getInstance(alg);
+            c.init(c.DECRYPT_MODE,getPrivateKey());
+            FileOutputStream fos = new FileOutputStream(archivo.getAbsolutePath()+".dclear");
+            byte[] b = new byte[blockDcifSize];
+            //Empezamos a leer
+            int i = fis.read(b);
+            while (i >= 0) {
+                System.out.print(i+".");
+                byte out[] = c.doFinal(b);
+                fos.write(out);
+                i = fis.read(b);
+            }
+            fos.close();
+            System.out.println("");
+            System.out.println("Hecho.");
+
+        }
+        else System.out.println("Error en la carga de cabecera de cifrado");
+        fis.close();
+        
+        
+        
+
     }
     
-    public void cifrar(File archivo){
+    public void cifrar(File archivo) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, FileNotFoundException, IllegalBlockSizeException, BadPaddingException, IOException{
+        System.out.println("Proceso de cifrado de: "+archivo.getAbsolutePath()+" con algoritmo: "+algoritmoCif);
+        Cipher c = Cipher.getInstance(algoritmoCif);
+        c.init(c.ENCRYPT_MODE,getPublicKey());
+        FileOutputStream fos = new FileOutputStream(archivo.getAbsolutePath()+".dcif");
+        cabecera = new Header(algoritmoCif);
+        cabecera.save(fos);
+        FileInputStream fis = new FileInputStream(archivo.getAbsolutePath());
+        byte[] b = new byte[blockCifSize];
+        int i = fis.read(b);
+        while (i != -1) {
+            System.out.print(i+".");
+            byte out[] = c.doFinal(b);
+            fos.write(out);
+            i = fis.read(b);
+        }
+        fos.close();
+        fis.close();
+        System.out.println("");
+        System.out.println("Hecho.");
         
     }
     
@@ -83,7 +136,7 @@ public class CifradoPublica {
           }
           return verifies;
         }
-        else System.out.println("Error en la carga 2");
+        else System.out.println("Error en la carga de cabecera de firma");
         fis.close();
         return false;
     }

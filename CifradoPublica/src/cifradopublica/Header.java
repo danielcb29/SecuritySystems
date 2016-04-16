@@ -163,9 +163,5 @@ public class Header {
     }
     catch (Exception e) {e.printStackTrace();};
   }
-
-  public static void main(String[] args){
-	  Header.test();
-  }
   
 }//FileHeader

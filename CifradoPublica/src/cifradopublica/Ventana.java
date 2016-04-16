@@ -12,6 +12,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -208,12 +211,50 @@ public class Ventana extends javax.swing.JFrame {
     private void opCifrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opCifrarActionPerformed
         // TODO add your handling code here:
         cargarArchivo();
+        if(modelo.cargarArchivo()){
+            try {
+                modelo.cifrar(archivo);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            taLog.append("No hay claves generadas, debe crearlas para poder operar");
+        }
         
     }//GEN-LAST:event_opCifrarActionPerformed
 
     private void opDecifrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opDecifrarActionPerformed
         // TODO add your handling code here:
         cargarArchivo();
+        if(modelo.cargarArchivo()){
+            try {
+                modelo.decifrar(archivo);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            taLog.append("No hay claves generadas, debe crearlas para poder operar");
+        }
     }//GEN-LAST:event_opDecifrarActionPerformed
 
     private void opFirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opFirmarActionPerformed
