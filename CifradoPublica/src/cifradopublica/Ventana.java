@@ -5,9 +5,14 @@
  */
 package cifradopublica;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 /**
@@ -21,6 +26,7 @@ public class Ventana extends javax.swing.JFrame {
      */
     
     CifradoPublica modelo;
+    File archivo;
     
     public Ventana() {
         initComponents();
@@ -66,15 +72,35 @@ public class Ventana extends javax.swing.JFrame {
         jMenu5.setText("Archivo");
 
         opCifrar.setText("Cifrar");
+        opCifrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                opCifrarActionPerformed(evt);
+            }
+        });
         jMenu5.add(opCifrar);
 
         opDecifrar.setText("Decifrar");
+        opDecifrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                opDecifrarActionPerformed(evt);
+            }
+        });
         jMenu5.add(opDecifrar);
 
         opFirmar.setText("Firmar");
+        opFirmar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                opFirmarActionPerformed(evt);
+            }
+        });
         jMenu5.add(opFirmar);
 
         opVerificar.setText("Verificar Firma");
+        opVerificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                opVerificarActionPerformed(evt);
+            }
+        });
         jMenu5.add(opVerificar);
 
         opSalir.setText("Salir");
@@ -132,6 +158,13 @@ public class Ventana extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cargarArchivo(){
+        String cwd = System.getProperty("user.dir");
+        final JFileChooser jfc = new JFileChooser(cwd);
+        if (jfc.showOpenDialog(this) !=JFileChooser.APPROVE_OPTION) return;
+        archivo = jfc.getSelectedFile();
+    }
+    
     private void ayudaDanielActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ayudaDanielActionPerformed
         // TODO add your handling code here:
         JOptionPane.showMessageDialog(rootPane, "Practica 3 Biometria y Seguridad de Sistemas \n"
@@ -171,6 +204,63 @@ public class Ventana extends javax.swing.JFrame {
             taLog.append("No hay claves generadas, por favor genere una! \n");
         }
     }//GEN-LAST:event_opVeractualActionPerformed
+
+    private void opCifrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opCifrarActionPerformed
+        // TODO add your handling code here:
+        cargarArchivo();
+        
+    }//GEN-LAST:event_opCifrarActionPerformed
+
+    private void opDecifrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opDecifrarActionPerformed
+        // TODO add your handling code here:
+        cargarArchivo();
+    }//GEN-LAST:event_opDecifrarActionPerformed
+
+    private void opFirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opFirmarActionPerformed
+        // TODO add your handling code here:
+        cargarArchivo();
+        if(modelo.cargarArchivo()){
+            try {
+                modelo.firmar(archivo);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SignatureException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            taLog.append("No hay claves generadas, debe crearlas para poder operar");
+        }
+        
+    }//GEN-LAST:event_opFirmarActionPerformed
+
+    private void opVerificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opVerificarActionPerformed
+        // TODO add your handling code here:
+        cargarArchivo();
+        if(modelo.cargarArchivo()){
+            try {
+                if(modelo.verificarFirma(archivo)){
+                    taLog.append("Firma verificada\n");
+                }else{
+                    taLog.append("Firma incorrecta\n");
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SignatureException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            taLog.append("No hay claves generadas, debe crearlas para poder operar");
+        }
+        
+    }//GEN-LAST:event_opVerificarActionPerformed
 
     /**
      * @param args the command line arguments
